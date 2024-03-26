@@ -1,6 +1,6 @@
 Package: clusterQ
 Type: Package
-Title: Estimation and inference for clustered Q-learning
+Title: Estimation and inference for clustered Q-learning 
 Version: 1.0
 Date: 2024-03-17
 Author: Yao Song
