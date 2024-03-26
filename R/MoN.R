@@ -127,9 +127,6 @@ MoN <- function(completeData,
   ############## Stage 2 analysis  ###############
   X2<-model.matrix(s2Formula,data=s2_data,...)
   s2Contrast<-diag(ncol(X2))
-  # lm.stage2 <- lm(s2Formula,data=s2_data,...)
-  # s2_cf <- coef(lm.stage2)
-  # Yao modifying to nmle
   stage2.model <- lme(s2Formula, data = s2_data,
                random = ~ 1 | cluster, 
                correlation = corCompSymm(form = ~ 1 | cluster), 
@@ -142,8 +139,6 @@ MoN <- function(completeData,
   for (i in 1:bootNum) {
     index <- sample(1:n2,n2,replace=TRUE)
     bootsamp <- s2_data[index,]
-    # bootest2[,i] <- s2Contrast%*%(2*s2_cf-coef(lm(s2Formula,data=bootsamp,...)))
-    # Yao modifying to nmle
     stage2.model.boot <- lme(s2Formula, data = bootsamp,
                         random = ~ 1 | cluster, 
                         correlation = corCompSymm(form = ~ 1 | cluster), 
@@ -173,10 +168,6 @@ MoN <- function(completeData,
     as.matrix(peudo_data[,s2_var_noint])%*%s2_cf[s2_var_noint]+
     abs(s2_cf[s2Treat]+
           as.matrix(peudo_data[,interact])%*%s2_cf[interaction])
-  # lm.stage1 <- lm(s1Formula,data=peudo_data,...)
-  # s1_cf <- coef(lm.stage1)
-  
-  # Yao modyfication
   stage1.model <- lme(s1Formula, data = peudo_data,
                       random = ~ 1 | cluster, 
                       correlation = corCompSymm(form = ~ 1 | cluster), 
@@ -188,19 +179,12 @@ MoN <- function(completeData,
   bootest1 <- matrix(0,nrow=dim(t(s1Contrast))[1],ncol=bootNum)
   k <- 0
   while ( k < bootNum ) {
-    # index <- sample(1:n1,M,replace=TRUE)
-    # bootsamp <- completeData[index,]
-    # bootsamp_s2 <- subset(bootsamp,bootsamp[,s2Indicator]==1)
-     
-    # Yao modification for resample based on defination of M
     index <- sample(1:n_cluster,M,replace=TRUE)
     bootsamp <- completeData[0,]
     for (i in index) {
       bootsamp <- rbind(bootsamp, completeData[completeData$cluster == i,])
     }
     bootsamp_s2 <- subset(bootsamp, !is.na(get(s2Treat))) # YS edited
-    # stage2cf <- coef(lm(s2Formula,data=bootsamp_s2,...))
-    # Yao modified 
     stage2.model.boot <- lme(s2Formula, data = bootsamp_s2,
                         random = ~ 1 | cluster, 
                         correlation = corCompSymm(form = ~ 1 | cluster), 
@@ -212,8 +196,6 @@ MoN <- function(completeData,
     
     if (sum(is.na(bootsamp[,s1_var[1]])) < (M * n1 / n_cluster)) {
       k <- k+1
-      # bootest1[,k] <- s1Contrast%*%(2*s1_cf-coef(lm(s1Formula,data=bootsamp,...)))
-      # Yao modified 
       stage1.model.boot <- lme(s1Formula, data = bootsamp,
                           random = ~ 1 | cluster, 
                           correlation = corCompSymm(form = ~ 1 | cluster), 
@@ -236,7 +218,6 @@ MoN <- function(completeData,
   
   cat("The estimated degree of nonregularity for stage 1 is", p, "\n")
   cat("chosen value of M =", M, "out of N =", n_cluster , "clusters.", "\n")
-  #print(paste0("The estimated degree of nonregularity for stage 1 is p = ", p, ", and the corresponding resample size for stage 1 is M = ", M, ".") )
   object <- list(s1Coefficients = s1_cf, 
                  s1Inference = stage1,
                  s2Coefficients = s2_cf, 

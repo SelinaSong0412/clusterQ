@@ -7,20 +7,17 @@
 #' 
 #' @return A vector of covariate names that interact with the target covariate
 #' 
-#' @export
-#' 
 #' @examples
 #' model_formula <- formula(Y ~ A1 * X2 + A1:X3 + X4)
 #' target_covariate <- "A1"
 #' interacting_variables <- interact.terms(model_formula, target_covariate)
-
+#' 
+#' @export
 interact.terms <- function(formula, target_covariate) {
   
   formula_str <- deparse(formula, width.cutoff = 200)
   interacting_variables <- character()
-  # Extract terms from the formula
   terms <- strsplit(formula_str, "~|\\s*(?![^(]*\\))\\s*[\\+\\-]\\s*", perl = TRUE)[[1]]
-  # terms <- strsplit(formula_str, "\\+|\\-|\\~")
   for (term in terms) {
     if (grepl(target_covariate, term)) {
       if (grepl(":", term) | grepl("\\*", term)) {

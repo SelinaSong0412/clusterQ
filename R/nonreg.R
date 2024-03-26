@@ -99,9 +99,6 @@ nonreg <- function(s2Formula,s2_data,
     interaction[match_num]<-interaction2[match_num]
   }
   
-  # frame <- model.frame(s2Formula,data=s2_data)
-  # Y <- model.response(frame)
-  
   # identifying nonreg terms
   nonreg_term <- c(s2Treat,interaction)
   nonreg_col <- match(nonreg_term,names(as.data.frame(X2)))
@@ -109,29 +106,16 @@ nonreg <- function(s2Formula,s2_data,
   
   H_interact_main <- s2_data %>%
     dplyr::select(cluster, all_of(interact)) %>% 
-    # dplyr::select(all_of(cluster, interact)) %>% 
-    # select(cluster, interact) %>% 
     distinct(cluster, .keep_all = TRUE) %>%
     dplyr::select(-cluster)
 
-  
-  # Yprime <- s2_cf[s2Treat] + as.matrix(frame[,interact])%*%s2_cf[interaction]
   Yprime <- as.numeric(s2_cf[s2Treat] + as.matrix(H_interact_main) %*%s2_cf[interaction])
   
-  # Yao modified: H matrix for each cluster
+  # H matrix for each cluster
   h <- cbind(1, as.matrix(H_interact_main))
   sigma2 <- n_cluster*diag(h%*%Sigma_nonreg%*%t(h))
-  # sigma2 <- diag(h%*%Sigma_nonreg%*%t(h))
-  # sigma2 <- diag(h%*%Sigma_stage2%*%t(h))/n2
-  # h <- cbind(1,as.matrix(s2_data[match(rownames(X2),rownames(s2_data)),interact]))
-  # h <- X2[,nonreg_col]
-  # sigma2 <- diag(h%*%Sigma_nonreg%*%t(h))/n_cluster
-  # sigma2 <- diag(h%*%Sigma_nonreg%*%t(h))
   
   TS <- abs(Yprime)/sqrt(sigma2)
-  # nu <- 0.05            # pretest level (\nu, in paper)
-  # cutoff <- qnorm(1 - nu/2)
-  # modification:
   cutoff <- qt(p = 1-nu/(2*n_cluster), df = n2/n_cluster - ncol(h))
   
   nonregularity <- (TS <= cutoff)
