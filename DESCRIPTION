@@ -1,0 +1,25 @@
+Package: clusterQ
+Type: Package
+Title: Estimation and inference for clustered Q-learning
+Version: 1.0
+Date: 2024-03-17
+Author: Yao Song
+Encoding: UTF-8
+Maintainer: Yao Song <yaos@umich.edu>
+Description: Functions to implement clustered Q-learning for estimating optimal
+        dynamic treatment regimes from multi-stage multi-level sequentially
+        randomized trials, and to perform inference via M-out-of-N
+        bootstrap for parameters indexing the optimal regime.
+LazyData: true
+Depends: 
+    R (>= 3.5.0)
+Imports:
+  MASS,
+  dplyr,
+  stats,
+  nlme,
+  tidyselect
+License: MIT + file LICENSE
+LazyLoad: yes
+Repository: CRAN
+RoxygenNote: 7.2.3
