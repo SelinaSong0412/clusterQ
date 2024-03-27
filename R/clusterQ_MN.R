@@ -7,7 +7,7 @@
 #' @param s2Formula A formula that specifying the regression model for stage 2 Q-function
 #' @param s2Treat A string that records variable name of stage 2 treatment in s2_data
 #' @param cluster A string that records variable name of the cluster identifier
-#' @param bootNum A number indicates number of bootstrap
+#' @param bootNum A number indicates number of bootstrap sampling in constructing CIs
 #' @param alpha A number indicates the type I error of inference, the default value is 0.05
 #' @param nu A number indicates the desired global type I error rate for t-test, the default value is 0.05
 #' @param lambda A number between 0 and 1 that governs the smallest acceptable resample size. Typical choice are between [0.025, 0.1], default value is 0.025 
@@ -15,11 +15,11 @@
 #' 
 #' @return A list containing 
 #' \itemize{
-#'   \item{s1Coefficients} {Stage 1 regression coefficients}
-#'   \item{s2Coefficients} {Stage 2 regression coefficients}
-#'   \item{s1Inference} {Stage 1 coefficients and confidence interval}
-#'   \item{s2Inference} {Stage 2 coefficients and confidence interval}
-#'   \item{estM} {Estimated stage 1 bootstrap resample size}
+#'   \item{s1Coefficients:} {Stage 1 regression coefficients}
+#'   \item{s2Coefficients:} {Stage 2 regression coefficients}
+#'   \item{s1Inference:} {Stage 1 coefficients and confidence interval}
+#'   \item{s2Inference:} {Stage 2 coefficients and confidence interval}
+#'   \item{estM:} {Estimated stage 1 bootstrap resample size}
 #' }
 #' 
 #' @importFrom MASS mvrnorm

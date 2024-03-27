@@ -28,7 +28,7 @@ clusterQ_MN(
 
 \item{cluster}{A string that records variable name of the cluster identifier}
 
-\item{bootNum}{A number indicates number of bootstrap}
+\item{bootNum}{A number indicates number of bootstrap sampling in constructing CIs}
 
 \item{alpha}{A number indicates the type I error of inference, the default value is 0.05}
 
@@ -41,11 +41,11 @@ clusterQ_MN(
 \value{
 A list containing 
 \itemize{
-  \item{s1Coefficients}{Stage 1 regression coefficients}
-  \item{s2Coefficients}{Stage 2 regression coefficients}
-  \item{s1Inference}{Stage 1 coefficients and confidence interval}
-  \item{s2Inference}{Stage 2 coefficients and confidence interval}
-  \item{estM}{Estimated stage 1 bootstrap resample size}
+  \item{s1Coefficients:} {Stage 1 regression coefficients}
+  \item{s2Coefficients:} {Stage 2 regression coefficients}
+  \item{s1Inference:} {Stage 1 coefficients and confidence interval}
+  \item{s2Inference:} {Stage 2 coefficients and confidence interval}
+  \item{estM:} {Estimated stage 1 bootstrap resample size}
 }
 }
 \description{

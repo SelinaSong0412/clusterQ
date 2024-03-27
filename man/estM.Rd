@@ -14,7 +14,7 @@ estM(N, p, lambda = 0.025)
 \item{lambda}{A number between 0 and 1 that governs the smallest acceptable resample size. Typical choice are between [0.025, 0.1], default value is 0.025}
 }
 \value{
-\item{M}{An estimated resample size}
+\item{M:} {An estimated resample size}
 }
 \description{
 A function that estimate the resample size M from N sample with given degree of nonregularity in the stage and a prespecified parameter \code{lambda}

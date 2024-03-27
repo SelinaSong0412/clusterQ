@@ -9,7 +9,7 @@
 #' @param nu A number that indicating the desired global type I error for t-test; default value is 0.05
 #' @param ... Additional parameters in lm
 #' 
-#' @return \item{p} {A scalar of estimated degree of nonregularity at stage 1}
+#' @return \item{p:} {A scalar of estimated degree of nonregularity at stage 1}
 #' 
 #' @importFrom MASS mvrnorm
 #' @importFrom stats model.matrix lm coef model.frame model.response vcov qt
@@ -112,15 +112,16 @@ nonreg <- function(s2Formula,s2_data,
     dplyr::select(-cluster)
 
   Yprime <- as.numeric(s2_cf[s2Treat] + as.matrix(H_interact_main) %*%s2_cf[interaction])
-  
-  # H matrix for each cluster
-  h <- cbind(1, as.matrix(H_interact_main))
+  h <- cbind(1, as.matrix(H_interact_main)) # h matrix for each patients
   sigma2 <- n_cluster*diag(h%*%Sigma_nonreg%*%t(h))
-  
   TS <- abs(Yprime)/sqrt(sigma2)
-  cutoff <- qt(p = 1-nu/(2*n_cluster), df = n2/n_cluster - ncol(h))
+  cutoff <- qt(p = 1-nu/(2*n_cluster), df = n2/n_cluster - 1)
   
-  nonregularity <- (TS <= cutoff)
+  # sigma2 <- diag(h%*%Sigma_nonreg%*%t(h))
+  # TS <- abs(Yprime)/sqrt(sigma2)
+  # cutoff <- qt(p = 1-nu/(2*n_cluster), df = n2/n_cluster - 1)
+  
+  nonregularity <- ifelse(TS <= cutoff, 1, 0)
   p <- mean(nonregularity)   # estimated value of the degree of non-regularity
   return(p)
 }
