@@ -81,6 +81,7 @@ gamma <- c(g0 = 1, g1 = 0.1, g2 = 0, g3 = 0.3, g4 = 0.4,
            g10 = 0, g11 = 0.1, g12 = 0.2, g13 = 1, g14 = 0.5,
            g15 = 0.8)
 delta <- c(d1 = 0.5, d2 = 0.3, d3 = 0.4, d4 = 0.2)
+expit <- function(x) {return(exp(x)/ (1 + exp(x)))}
 
 df <- df %>% 
   mutate(X21 = rnorm(n),                             # Stage 2 patient-level data
@@ -107,7 +108,8 @@ df <- df %>%
 Formula1 = formula(Y ~ X11 + X12 + Z11 + Z12 + A1 + Z11 * A1 + Z12 * A1)
 
 # stage 2 model
-Formula2 = formula(Y ~ X11 + X12 + X21 + X22 + Z11 + Z12 + Z21 + Z22 + A1 + A2 + Z11 * A1 + Z12 * A1 + Z21 * A2 + Z22 * A2 + A1 * A2)
+Formula2 = formula(Y ~ X11 + X12 + X21 + X22 + Z11 + Z12 + Z21 + Z22 + 
+                     A1 + A2 + Z11 * A1 + Z12 * A1 + Z21 * A2 + Z22 * A2 + A1 * A2)
 ```
 
 ***Estimating degree of nonregularity***
@@ -115,7 +117,8 @@ Formula2 = formula(Y ~ X11 + X12 + X21 + X22 + Z11 + Z12 + Z21 + Z22 + A1 + A2 +
 Use function `nonreg()` to estimate the degree of nonregularity given the data and stage 2 Q-function. 
 
 ```{r}
-p = nonreg(s2Formula = Formula2, s2_data = df, s2Treat = "A2", cluster = "cluster_id", nu = 0.05)
+p = nonreg(s2Formula = Formula2, s2_data = df, s2Treat = "A2", 
+           cluster = "cluster_id", nu = 0.05)
 p
 ```
 
