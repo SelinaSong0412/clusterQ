@@ -1,0 +1,362 @@
+---
+title: "Simulation Study for Two-stage Q-learning with M-out-of-N Boostrap"
+author: "Yao Song"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Simulation Study for Two-stage Q-learning with M-out-of-N Boostrap}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+expit <- function(x) {return(exp(x)/ (1 + exp(x)))}
+library(nlme)
+library(geepack)
+library(MASS)
+library(dplyr)
+```
+
+
+Package example for MoN
+```{r}
+# Simple Simulation on 1000 subjects
+simdata<-matrix(0,nrow=1000,ncol=6)
+colnames(simdata)<-c("H1","A1","Y1","H2","A2","Y2")
+simdata<-as.data.frame(simdata)
+
+# Randomly generate stage 1 covariates and stage 1 and 2 treatments
+set.seed(123)
+simdata[,c("H1")]<-rbinom(1000,1,0.5)
+set.seed(234)
+simdata[,c("A1")]<-2*rbinom(1000,1,0.5)-1
+set.seed(345)
+simdata[,c("A2")]<-2*rbinom(1000,1,0.5)-1
+
+# Generate stage 2 covariates based on H1 and T1
+expit<-exp(0.5*simdata$H1+0.5*simdata$A1)/(1+exp(0.5*simdata$H1+0.5*simdata$A1))
+simdata$H2<-2*rbinom(1000,1,expit)-1
+
+# Assume stage 1 outcome Y1 is 0
+# Generate stage 2 outcome Y2
+simdata$Y2 <- 0.2* simdata$H1 + 0.6 * simdata$H2 + 0.15 * (simdata$A2)^2 + 0.45 * simdata$A2*simdata$A1 - 0.57 * simdata$A1 + rnorm(1000)
+
+# Randomly assign 500 subjects to S2
+set.seed(456)
+simdata[sample(1000,500),c("A2","Y2")]<-NA
+
+# Define models for both stages
+s2Formula<-Y2~H1*A1+A1*A2+A2*H2
+s1Formula<-Y1~H1*A1
+
+# Fixed lambda as 0.05
+result_sim = MoN(simdata, s1Formula, s2Formula, s2Treat="A2",
+    bootNum=100, lambda=0.05)
+
+# selected M
+data.frame(N = nrow(simdata), M = result_sim$estM)
+
+# Stage 1 inference
+result_sim$s1Inference
+
+# Stage 2 inference
+result_sim$s2Inference
+```
+
+try to generate data for one stage
+```{r}
+set.seed(123) # For reproducibility
+
+# Number of patients
+n <- 1000
+
+# Number of clinics
+n_clinics <- 20
+
+# Generate data
+df <- data.frame(
+  id = rep(1:n_clinics, each = n / n_clinics), # Clinic identifier
+  X1 = rnorm(n), # Patient-level predictor 1
+  X2 = rnorm(n), # Patient-level predictor 2
+  A = rep(2*rbinom(n_clinics, 1, 0.5)-1, each = n / n_clinics), # Cluster-level intervention
+  Y = rnorm(n) # Outcome variable
+)
+
+# Add clinic-level predictors (same for patients within the same clinic)
+df$Z1 <- ave(df$id, df$id, FUN = function(x) rnorm(1, mean = 2))
+df$Z2 <- ave(df$id, df$id, FUN = function(x) rnorm(1, mean = 3))
+
+Formula = formula(Y ~ X1 + X2 + Z1 + Z2 + A + A:Z1 + A:Z2)
+```
+
+## Yao: Testing function usage in the package 
+
+Simulate 2 stage data
+```{r}
+set.seed(412) # For reproducibility
+
+# Define number of observations and clusters
+n <- 2000
+n_clusters <- 100
+n_per_cluster <- n / n_clusters
+
+# Parameters for simulating Z21 and Z22 based on the given model
+delta_1 <- 0.5
+delta_2 <- 0.3
+delta_3 <- 0.4
+delta_4 <- 0.2
+
+# Parameters for simulating Y based on the given model
+gamma_0 <- 1.0
+gamma_1 <- 0.1
+gamma_2 <- 0.1
+gamma_3 <- 0.2
+gamma_4 <- 0.2
+gamma_5 <- 0.3
+gamma_6 <- 0.3
+gamma_7 <- 0.4
+gamma_8 <- 0.4
+gamma_9 <- 0.5
+gamma_10 <- 0.5
+gamma_11 <- 0.6
+gamma_12 <- 0.6
+gamma_13 <- 0.7
+gamma_14 <- 0.7
+gamma_15 <- 0.8
+
+
+# Simulate Stage 1 data
+df <- data.frame(
+  cluster_id = rep(1:n_clusters, each = n_per_cluster),
+  X11 = rnorm(n), # Stage 1 patient-level data
+  X12 = rnorm(n), # Another Stage 1 patient-level variable
+  X21 = rnorm(n), # Stage 2 patient-level data
+  X22 =  rnorm(n), # Another Stage 2 patient-level variable
+  # Z11 = rep(rnorm(n_clusters, 2, 1), each = n_per_cluster), # Stage 1 cluster-level data
+  # Z12 = rep(rnorm(n_clusters, 3, 1), each = n_per_cluster), # Another Stage 1 cluster-level variable
+  Z11 = rep(rbinom(n_clusters, 1, 0.5), each = n_per_cluster),
+  Z12 = rep(rbinom(n_clusters, 1, 0.5), each = n_per_cluster),
+  # A1 = rep(sample(c(-1, 1), n_clusters, replace = TRUE), each = n_per_cluster), # Stage 1 intervention data
+  # A2 =  rep(sample(c(-1, 1), n_clusters, replace = TRUE), each = n_per_cluster) # Stage 2 intervention data
+  A1 = rep(2*rbinom(n_clusters, 1, 0.5)-1, each = n_per_cluster),
+  A2 = rep(2*rbinom(n_clusters, 1, 0.5)-1, each = n_per_cluster)
+)
+df <- df %>% 
+  mutate(Z21 = rep(rbinom(n_clusters, 1, expit(delta_1 * Z11 + delta_2 * A1)), each = n_per_cluster),
+         Z22 = rep(rbinom(n_clusters, 1, expit(delta_3 * Z12 + delta_4 * A1)), each = n_per_cluster),
+         Y =  gamma_0 + 
+              gamma_1 * X11 + gamma_2 * X12 + 
+              gamma_3 * X21 + gamma_4 * X22 + 
+              gamma_5 * Z11 + gamma_6 * Z12 + 
+              gamma_7 * Z21 + gamma_8 * Z22 + 
+              gamma_9 * A1 + gamma_10 * A2 + 
+              gamma_11 * Z11 * A1 + gamma_12 * Z12 * A1 + 
+              gamma_13 * Z21 * A2 + gamma_14 * Z22 * A2 + 
+              gamma_15 * A1 * A2 + rnorm(n, mean = 0, sd = 1))
+```
+
+Generate model (form of Q-functions) for two stages
+```{r}
+# stage 1 model
+Formula1 = formula(Y ~ X11 + X12 + Z11 + Z12 + A1 + Z11 * A1 + Z12 * A1)
+
+# stage 2 model
+Formula2 = formula(Y ~ X11 + X12 + X21 + X22 + Z11 + Z12 + Z21 + Z22 + A1 + A2 + Z11 * A1 + Z12 * A1 + Z21 * A2 + Z22 * A2 + A1 * A2)
+```
+
+Estimating Degree of nonregularity at stage 1; testing usage of MoN function
+```{r}
+p = nonreg(Formula2, df, "A2", "cluster_id", nu = 0.05)
+M = estM(n_clusters, p, lambda = 0.025)
+result = MoN(completeData = df,
+    s1Formula = Formula1,
+    s2Formula = Formula2,
+    s2Treat = "A2",
+    cluster = "cluster_id", 
+    bootNum =100)
+```
+
+
+
+```{r}
+N = 100
+n = 2000
+ni = n/N
+rho = 0.4
+
+# Coefficients for the outcome model
+gamma <- c(g0 = 1, g1 = 0.1, g2 = 0.2, g3 = 0.3, g4 = 0.4,
+           g5 = 0.5, g6 = 0.6, g7 = 0.7, g8 = 0.8, g9 = 0.9,
+           g10 = 1, g11 = 0, g12 = 0, g13 = 0, g14 = 0,
+           g15 = 0)
+           
+# Parameters for Z21 and Z22 simulation
+delta <- c(d1 = 0.5, d2 = 0.3, d3 = 0.4, d4 = 0.2)
+
+set.seed(412) # For reproducibility
+
+# Simulate Stage 1 data
+df <- data.frame(
+  cluster_id = rep(1:N, each = ni),
+  X11 = rnorm(n), # Stage 1 patient-level data
+  X12 = rnorm(n), # Another Stage 1 patient-level variable
+  X21 = rnorm(n), # Stage 2 patient-level data
+  X22 =  rnorm(n), # Another Stage 2 patient-level variable
+  Z11 = rep(rbinom(N, 1, 0.5), each = ni),
+  Z12 = rep(rbinom(N, 1, 0.5), each = ni),
+  A1 = rep(2*rbinom(N, 1, 0.5)-1, each = ni),
+  A2 = rep(2*rbinom(N, 1, 0.5)-1, each = ni)
+)
+# Generating residuals with intra-cluster correlation (ICC)
+Sigma <- matrix(rho, N, N) + diag(1-rho, N)  # Exchangeable correlation matrix
+cluster_residuals <- mvrnorm(n = ni, mu = rep(0, N), Sigma = Sigma)
+
+df <- df %>% 
+  mutate(Z21 = rep(rbinom(N, 1, expit(delta["d1"] * Z11 + delta["d2"] * A1)), each = ni),
+         Z22 = rep(rbinom(N, 1, expit(delta["d3"] * Z12 + delta["d4"] * A1)), each = ni),
+         Y =  gamma["g0"] +
+              gamma["g1"] * X11 + gamma["g2"] * X12 +
+              gamma["g3"] * X21 + gamma["g4"] * X22 +
+              gamma["g5"] * Z11 + gamma["g6"] * Z12 +
+              gamma["g7"] * Z21 + gamma["g8"] * Z22 +
+              gamma["g9"] * A1 + gamma["g10"] * A2 +
+              gamma["g11"] * Z11 * A1 + gamma["g12"] * Z12 * A1 +
+              gamma["g13"] * Z21 * A2 + gamma["g14"] * Z22 * A2 +
+              gamma["g15"] * A1 * A2 + as.numeric(cluster_residuals)
+         )
+```
+
+Generate model (form of Q-functions) for two stages
+```{r}
+# stage 1 model
+Formula1 = formula(Y ~ X11 + X12 + Z11 + Z12 + A1 + Z11 * A1 + Z12 * A1)
+
+# stage 2 model
+Formula2 = formula(Y ~ X11 + X12 + X21 + X22 + Z11 + Z12 + Z21 + Z22 + A1 + A2 + Z11 * A1 + Z12 * A1 + Z21 * A2 + Z22 * A2 + A1 * A2)
+```
+
+Estimating Degree of nonregularity at stage 1; testing usage of MoN function
+```{r}
+library(dplyr)
+p = nonreg(s2Formula = Formula2, s2_data = df, s2Treat = "A2", cluster = "cluster_id", nu = 0.05)
+M = estM(N, p, lambda = 0.025)
+MoN(completeData = df,
+    s1Formula = Formula1,
+    s2Formula = Formula2,
+    s2Treat = "A2",
+    cluster = "cluster_id", 
+    bootNum = 100)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Replecate Kelly's simulation
+
+***Scenario 1: $N = 80, n_i = 20$***
+```{r}
+
+```
+***Scenario 2: ***
+```{r}
+
+```
+
+***Scenario 3: ***
+```{r}
+
+```
+
+
+## Yao's new simulation:  
+
+Suppose we have a true talioring variable which is a individual level variable $X_{ij}$.
+However, we fit the model using the cluster level summary of it, say $Z_i$
+
+Compare the inference results between the mn and MN
+
+```{r}
+N = 80
+n = 1600
+ni = n/N
+rho = 0.4
+
+# Coefficients for the outcome model
+gamma <- c(g0 = 1, 
+           g1 = 0.1, 
+           g2 = 0.2, 
+           g3 = 0.3, 
+           g4 = 0.4,
+           g5 = 0.5, 
+           g6 = 0.6, 
+           g7 = 0.7)
+           
+# Parameters for Z21 and Z22 simulation
+delta <- c(d1 = 0.5, d2 = 0.3)
+
+
+set.seed(412) # For reproducibility
+
+# Simulate Stage 1 data
+df <- data.frame(
+  cluster_id = rep(1:N, each = ni),
+  X1 = rbinom(n, 1, 0.5), # Stage 1 patient-level data
+  A1 = rep(2*rbinom(N, 1, 0.5)-1, each = ni),
+  A2 = rep(2*rbinom(N, 1, 0.5)-1, each = ni)
+)
+
+df <- df %>% 
+  mutate(X2 = rbinom(n, 1, expit(delta["d1"] * X1 + delta["d2"] * A1))) %>% # Stage 2 patient-level data
+  mutate(Z1 = mean(X1), .by=cluster_id) %>%
+  mutate(Z2 = mean(X2), .by=cluster_id)
+  
+# Generating residuals with intra-cluster correlation
+Sigma <- matrix(rho, N, N) + diag(1-rho, N)  # Exchangeable correlation matrix
+cluster_residuals <- mvrnorm(n = ni, mu = rep(0, N), Sigma = Sigma)
+
+df <- df %>% 
+  mutate(Y =  gamma["g0"] +
+              gamma["g1"] * X1 + gamma["g2"] * X2 +
+              gamma["g3"] * A1 + gamma["g4"] * A2 +
+              gamma["g5"] * X1 * A1 + gamma["g6"] * X2 * A2 +
+              gamma["g7"] * A1 * A2 + as.numeric(cluster_residuals)
+         )
+```
+
+Generate model (form of Q-functions) for two stages
+```{r}
+# stage 1 model
+Formula1 = formula(Y ~ Z1 + A1 + Z1 * A1)
+
+# stage 2 model
+Formula2 = formula(Y ~ Z1 + Z2 + A1 + A2 + Z1 * A1 + Z2 * A2 + A1 * A2)
+```
+
+Estimating Degree of nonregularity at stage 1; testing usage of MoN function
+```{r}
+p = nonreg(s2Formula = Formula2, s2_data = df, s2Treat = "A2", cluster = "cluster_id", nu = 0.01)
+M = estM(N, p, lambda = 0.025)
+MoN(completeData = df,
+    s1Formula = Formula1,
+    s2Formula = Formula2,
+    s2Treat = "A2",
+    cluster = "cluster_id", 
+    bootNum = 100)
+```
+
+
+

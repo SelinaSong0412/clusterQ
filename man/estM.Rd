@@ -19,3 +19,8 @@ estM(N, p, lambda = 0.025)
 \description{
 A function that estimate the resample size M from N sample with given degree of nonregularity in the stage and a prespecified parameter \code{lambda}
 }
+\examples{
+M_hat <- estM(N = 100, p = 0.45, lambda = 0.02) 
+M_hat
+
+}

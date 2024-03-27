@@ -21,4 +21,5 @@ A function that identifying all interaction covariates with a target covariate i
 model_formula <- formula(Y ~ A1 * X2 + A1:X3 + X4)
 target_covariate <- "A1"
 interacting_variables <- interact.terms(model_formula, target_covariate)
+
 }

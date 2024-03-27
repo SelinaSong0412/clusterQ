@@ -7,11 +7,11 @@
 nonreg(s2Formula, s2_data, s2Treat, cluster, nu = 0.05, ...)
 }
 \arguments{
-\item{s2Formula}{A formula that specifying the regression model for stage 2 Q-function}
+\item{s2Formula}{A formula that specifying the regression model for Q-function of the next stage.}
 
-\item{s2_data}{A matrix contains all stage 2 data including covariates, outcome and treatment}
+\item{s2_data}{A matrix contains the next stage data including covariates, outcome and treatment}
 
-\item{s2Treat}{A string that records variable name of stage 2 treatment in s2_data}
+\item{s2Treat}{A string that records variable name of next stage treatment in `s2_data`}
 
 \item{cluster}{A string that records variable name of the cluster identifier}
 
@@ -23,9 +23,11 @@ nonreg(s2Formula, s2_data, s2Treat, cluster, nu = 0.05, ...)
 \item{p}{A scalar of estimated degree of nonregularity at stage 1}
 }
 \description{
-A function that estimate the degree of nonregularity in the stages prior to the last stage.
+A function that estimate the degree of nonregularity using the next stage information.
 }
 \examples{
+library(dplyr)
+expit <- function(x) {return(exp(x)/ (1 + exp(x)))}
 N = 100
 n = 2000
 ni = n/N

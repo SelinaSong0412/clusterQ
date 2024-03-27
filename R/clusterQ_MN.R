@@ -1,6 +1,6 @@
-#' Inference under nonregrularity with M-out-of-N bootstrap 
+#' Inference under nonregrularity with M-out-of-N cluster bootstrap 
 #' 
-#' @description A function that using M resample size out of N samples to conduct bootstrap and make inference on regression parameters to adjust for nonregrularity
+#' @description A function that use clustered Q-learning to produce estimation and inference on regression parameters for two stages. It uses M-out-of-N cluster bootstrap (M resample out of N samples) to adjust for potential nonregrularity for the first stage inference.
 #'
 #' @param completeData A matrix contains all data including covariates, outcome and treatment
 #' @param s1Formula A formula that specifying the regression model for stage 1 Q-function
@@ -15,19 +15,20 @@
 #' 
 #' @return A list containing 
 #' \itemize{
-#'   \item{s1Coefficients}{Stage 1 regression coefficients}
-#'   \item{s2Coefficients}{Stage 2 regression coefficients}
-#'   \item{s1Inference}{Stage 1 coefficients and confidence interval}
-#'   \item{s2Inference}{Stage 2 coefficients and confidence interval}
-#'   \item{estM}{Estimated stage 1 bootstrap resample size}
+#'   \item{s1Coefficients} {Stage 1 regression coefficients}
+#'   \item{s2Coefficients} {Stage 2 regression coefficients}
+#'   \item{s1Inference} {Stage 1 coefficients and confidence interval}
+#'   \item{s2Inference} {Stage 2 coefficients and confidence interval}
+#'   \item{estM} {Estimated stage 1 bootstrap resample size}
 #' }
 #' 
 #' @importFrom MASS mvrnorm
 #' @importFrom stats model.matrix as.formula lm coef quantile model.frame 
 #' @importFrom dplyr %>% mutate case_when
 #' @importFrom nlme lme fixef corCompSymm
-#' 
 #' @examples 
+#' library(dplyr)
+#' expit <- function(x) {return(exp(x)/ (1 + exp(x)))}
 #' N = 100
 #' n = 2000
 #' ni = n/N
@@ -60,10 +61,9 @@
 #' Sigma <- matrix(rho, N, N) + diag(1-rho, N)  # Exchangeable correlation matrix
 #' cluster_residuals <- MASS::mvrnorm(n = ni, mu = rep(0, N), Sigma = Sigma)
 #' 
-#' df <- df %>% 
-#'   mutate(Z21 = rep(rbinom(N, 1, expit(delta["d1"] * Z11 + delta["d2"] * A1)), each = ni),
-#'          Z22 = rep(rbinom(N, 1, expit(delta["d3"] * Z12 + delta["d4"] * A1)), each = ni),
-#'          Y =  gamma["g0"] +
+#' df = mutate(df, Z21 = rep(rbinom(N, 1, expit(delta["d1"] * Z11 + delta["d2"] * A1)), each = ni))
+#' df = mutate(df, Z22 = rep(rbinom(N, 1, expit(delta["d3"] * Z12 + delta["d4"] * A1)), each = ni))
+#' df = mutate(df, Y =  gamma["g0"] +
 #'            gamma["g1"] * X11 + gamma["g2"] * X12 +
 #'            gamma["g3"] * X21 + gamma["g4"] * X22 +
 #'            gamma["g5"] * Z11 + gamma["g6"] * Z12 +
@@ -71,19 +71,19 @@
 #'            gamma["g9"] * A1 + gamma["g10"] * A2 +
 #'            gamma["g11"] * Z11 * A1 + gamma["g12"] * Z12 * A1 +
 #'            gamma["g13"] * Z21 * A2 + gamma["g14"] * Z22 * A2 +
-#'            gamma["g15"] * A1 * A2 + as.numeric(cluster_residuals)
-#'   )
+#'            gamma["g15"] * A1 * A2 + as.numeric(cluster_residuals))
+#'   
 #' # stage 1 model
 #' Formula1 = formula(Y ~ X11 + X12 + Z11 + Z12 + A1 + Z11 * A1 + Z12 * A1)
 #' 
 #' # stage 2 model
-#' Formula2 = formula(Y ~ X11 + X12 + X21 + X22 + Z11 + Z12 + Z21 + Z22 + A1 + A2 + Z11 * A1 + Z12 * A1 + Z21 * A2 + Z22 * A2 + A1 * A2)
-#' result = MoN(completeData = df,s1Formula = Formula1,s2Formula = Formula2, s2Treat = "A2",cluster = "cluster_id", bootNum =100)
+#' Formula2 = formula(Y ~ X11 + X12 + X21 + X22 + Z11 + Z12 + Z21 + Z22 + A1 + A2 + 
+#' Z11 * A1 + Z12 * A1 + Z21 * A2 + Z22 * A2 + A1 * A2)
+#' result = clusterQ_MN(completeData = df,s1Formula = Formula1,s2Formula = Formula2, s2Treat = "A2",cluster = "cluster_id", bootNum =100)
 #' result$s1Inference # check stage 1 inference
 #' result$s2Inference # check stage 2 inference
-#' 
 #' @export
-MoN <- function(completeData,
+clusterQ_MN <- function(completeData,
                 s1Formula,# s1Contrast,# not necessary delete
                 s2Formula,# s2Contrast,
                 s2Treat,# interact,# s2Indicator,# (delete)
@@ -153,7 +153,7 @@ MoN <- function(completeData,
   colnames(stage2) <- c("S2_Estimator", "Lower", "Upper")
   rownames(stage2) <- names(s2_cf) 
   stage2 <- as.data.frame(stage2)
-  stage2 <- stage2 %>% 
+  stage2 <- stage2 %>%
     mutate(sig= case_when(Lower*Upper > 0 ~ "*",
                           TRUE ~ ""))
   
@@ -212,7 +212,7 @@ MoN <- function(completeData,
   colnames(stage1)<-c("S1_Estimator", "Lower", "Upper")
   rownames(stage1) <- names(s1_cf) 
   stage1 <- as.data.frame(stage1)
-  stage1 <- stage1 %>% 
+  stage1 <- stage1 %>%
     mutate(sig= case_when(Lower*Upper > 0 ~ "*",
                           TRUE ~ ""))
   
