@@ -24,7 +24,7 @@ expit <- function(x) {return(exp(x)/ (1 + exp(x)))}
 <!-- badges: start -->
 <!-- badges: end -->
 
-A clustered Q-learning algorithm with M-out-of-N cluster bootstrap for making inference on tailoring variables for optimal dynamic treatment regimes (DTR) from clustered sequential multiple assignment randomized trials (clustered SMART). This tool is developed based on work by Speth, et al. (2024).
+A clustered Q-learning algorithm with $M$-out-of-$N$ cluster bootstrap for making inference on tailoring variables for optimal dynamic treatment regimes (DTR) from clustered sequential multiple assignment randomized trials (clustered SMART). This tool is developed based on work by Speth, et al. (2024).
 
 
 ## Installation
@@ -47,7 +47,7 @@ library(clusterQ)
 
 ***Simulate clustered SMART data***
 
-We generate a simulated clustered SMART trial that has N = 100 sites, and n = 2000 observations in total. Here we assume number of individuals in each sites are equal. Let the intra-cluster correlation be $\rho = 0.2$. 
+We generate a simulated clustered SMART trial that has $N$ = 100 sites, and $n$ = 2000 observations in total. Here we assume number of individuals in each sites are equal. Let the intra-cluster correlation be $\rho = 0.2$. 
 
 ```{r}
 N = 100      # number of clusters
@@ -58,7 +58,7 @@ Sigma <- matrix(rho, N, N) + diag(1-rho, N)  # Exchangeable correlation matrix
 cluster_residuals <- mvrnorm(n = ni, mu = rep(0, N), Sigma = Sigma)
 ```
 
-We consider 2 patient-level covariates $X_1$ and $X_2$, and 2 cluster-level data $Z_1$ and $Z_2$. Assume treatment at each stages ($A_1$ and $A_2$) were randomly assigned at equal weight. Stage 2 data can be simulated as follows:
+We consider two patient-level covariates $X_1$ and $X_2$, and two cluster-level data $Z_1$ and $Z_2$. Assume treatment at each stages ($A_1$ and $A_2$) were randomly assigned at equal weight. Stage 2 data can be simulated as follows:
 
 ```{r}
 ################ Simulate Stage 2 data ###################
@@ -128,7 +128,7 @@ M = estM(N, p, lambda = 0.025)
 M
 ```
 
-***Inference with $M$-out-of-$N$ cluster bootstrap***
+***Inference with M-out-of-N cluster bootstrap***
 
 By specify number of bootstrap sampling for constructing confidence interval in `bootNum`, tuning parameter `lambda` for identifying resample size, and the global type-I error `alpha`, result on estimation and inference for both stage model can be obtained.
 ```{r}
