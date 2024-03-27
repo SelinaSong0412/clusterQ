@@ -153,6 +153,7 @@ clusterQ_MN <- function(completeData,
   colnames(stage2) <- c("S2_Estimator", "Lower", "Upper")
   rownames(stage2) <- names(s2_cf) 
   stage2 <- as.data.frame(stage2)
+  stage2 <- round(stage2,4)
   stage2 <- stage2 %>%
     mutate(sig= case_when(Lower*Upper > 0 ~ "*",
                           TRUE ~ ""))
@@ -212,6 +213,7 @@ clusterQ_MN <- function(completeData,
   colnames(stage1)<-c("S1_Estimator", "Lower", "Upper")
   rownames(stage1) <- names(s1_cf) 
   stage1 <- as.data.frame(stage1)
+  stage1 <- round(stage1,4)
   stage1 <- stage1 %>%
     mutate(sig= case_when(Lower*Upper > 0 ~ "*",
                           TRUE ~ ""))
