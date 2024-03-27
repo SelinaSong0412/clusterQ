@@ -41,11 +41,11 @@ clusterQ_MN(
 \value{
 A list containing 
 \itemize{
-  \item{s1Coefficients:} {Stage 1 regression coefficients}
-  \item{s2Coefficients:} {Stage 2 regression coefficients}
-  \item{s1Inference:} {Stage 1 coefficients and confidence interval}
-  \item{s2Inference:} {Stage 2 coefficients and confidence interval}
-  \item{estM:} {Estimated stage 1 bootstrap resample size}
+  \item{s1Coefficients:}{ Stage 1 regression coefficients}
+  \item{s2Coefficients:}{ Stage 2 regression coefficients}
+  \item{s1Inference:}{ Stage 1 coefficients and confidence interval}
+  \item{s2Inference:}{ Stage 2 coefficients and confidence interval}
+  \item{estM:}{ Estimated stage 1 bootstrap resample size}
 }
 }
 \description{

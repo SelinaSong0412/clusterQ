@@ -9,7 +9,7 @@
 #' @param nu A number that indicating the desired global type I error for t-test; default value is 0.05
 #' @param ... Additional parameters in lm
 #' 
-#' @return \item{p:} {A scalar of estimated degree of nonregularity at stage 1}
+#' @return \item{p:}{ A scalar of estimated degree of nonregularity at stage 1}
 #' 
 #' @importFrom MASS mvrnorm
 #' @importFrom stats model.matrix lm coef model.frame model.response vcov qt

@@ -20,7 +20,7 @@ nonreg(s2Formula, s2_data, s2Treat, cluster, nu = 0.05, ...)
 \item{...}{Additional parameters in lm}
 }
 \value{
-\item{p:} {A scalar of estimated degree of nonregularity at stage 1}
+\item{p:}{ A scalar of estimated degree of nonregularity at stage 1}
 }
 \description{
 A function that estimate the degree of nonregularity using the next stage information.
