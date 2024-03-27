@@ -9,8 +9,8 @@
 A clustered Q-learning algorithm with M-out-of-N cluster bootstrap for
 making inference on tailoring variables for optimal dynamic treatment
 regimes (DTR) from clustered sequential multiple assignment randomized
-trials (clustered SMART). This tool is developed based on paper by
-Speth, et al. (2024).
+trials (clustered SMART). This tool is developed based on work by Speth,
+et al. (2024).
 
 ## Installation
 
@@ -68,9 +68,9 @@ Then, we csimulate the stage 2 data as follows:
 ``` r
 ################ Simulate Stage 2 data ###################
 # True parameters for the outcome model
-gamma <- c(g0 = 1, g1 = 0.1, g2 = 0.2, g3 = 0.3, g4 = 0.4,
-           g5 = 0.5, g6 = 0.6, g7 = 0.7, g8 = 0.8, g9 = 0.9,
-           g10 = 1, g11 = 0.1, g12 = 0.2, g13 = 0.3, g14 = 0.5,
+gamma <- c(g0 = 1, g1 = 0.1, g2 = 0, g3 = 0.3, g4 = 0.4,
+           g5 = 0.5, g6 = 0, g7 = 0, g8 = 0.8, g9 = 0,
+           g10 = 0, g11 = 0.1, g12 = 0.2, g13 = 1, g14 = 0.5,
            g15 = 0.8)
 delta <- c(d1 = 0.5, d2 = 0.3, d3 = 0.4, d4 = 0.2)
 
@@ -110,29 +110,29 @@ the data and stage 2 Q-function.
 ``` r
 p = nonreg(s2Formula = Formula2, s2_data = df, s2Treat = "A2", cluster = "cluster_id", nu = 0.05)
 p
-#> [1] 0.71
+#> [1] 0.87
 ```
 
 ***Calcuating the resample size at stage 1***
 
-Use function `nonreg()` to calculate the resample size (M) from N
-clusters at stage 1.
+Use function `estM()` to calculate the resample size (M) from N clusters
+at stage 1.
 
 ``` r
 M = estM(N, p, lambda = 0.025)
 M
-#> [1] 93
+#> [1] 91
 ```
 
 ***Inference with $M$-out-of-$N$ cluster bootstrap***
 
-By specify number of boostrap sampling for constructing confidence
+By specify number of bootstrap sampling for constructing confidence
 interval in `bootNum`, tuning parameter `lambda` for identifying
 resample size, and the global type-I error `alpha`, result on estimation
 and inference for both stage model can be obtained.
 
 ``` r
-results = clusterQ::clusterQ_MN(completeData = df,
+results = clusterQ_MN(completeData = df,
                       s1Formula = Formula1,
                       s2Formula = Formula2,
                       s2Treat = "A2",
@@ -140,44 +140,44 @@ results = clusterQ::clusterQ_MN(completeData = df,
                       bootNum = 100,
                       lambda = 0.025,
                       alpha = 0.05)
-#> The estimated degree of nonregularity for stage 1 is 0.71 
-#> chosen value of M = 93 out of N = 100 clusters.
+#> The estimated degree of nonregularity for stage 1 is 0.87 
+#> chosen value of M = 91 out of N = 100 clusters.
 ```
 
 Check stage 1 inference by:
 
 ``` r
 results$s1Inference
-#>             S1_Estimator     Lower     Upper sig
-#> (Intercept)    4.7089434 4.0255665 5.3066673   *
-#> X11            0.2916834 0.1991565 0.3998238   *
-#> X12            0.4516492 0.3133602 0.5491326   *
-#> Z11            1.1899747 0.6013415 1.8372131   *
-#> Z12            2.1365684 1.4754089 2.7422353   *
-#> A1             2.3756589 1.7869391 3.1379072   *
-#> Z11:A1         0.8090647 0.1413179 1.3766566   *
-#> Z12:A1         0.8162722 0.1534394 1.4272422   *
+#>             S1_Estimator       Lower       Upper sig
+#> (Intercept)   3.91701374  3.42129727  4.43083264   *
+#> X11           0.29544851  0.19280881  0.37542827   *
+#> X12          -0.01978719 -0.12660979  0.09560967    
+#> Z11           0.62425919 -0.03116650  1.12143191    
+#> Z12          -0.62495070 -1.12402201 -0.01268648   *
+#> A1            0.52106373  0.06197384  0.97244510   *
+#> Z11:A1        0.07575821 -0.37390330  0.47974252    
+#> Z12:A1        0.19655353 -0.22973965  0.62498848
 ```
 
 Check stage 2 inference by:
 
 ``` r
 results$s2Inference
-#>             S2_Estimator      Lower     Upper sig
-#> (Intercept)    0.9616716 0.86413356 1.0800984   *
-#> X11            0.1328785 0.09653853 0.1763828   *
-#> X12            0.2226868 0.17137026 0.2562611   *
-#> X21            0.3090488 0.26197014 0.3564879   *
-#> X22            0.4019560 0.35750736 0.4450930   *
-#> Z11            0.4736197 0.39563307 0.5626672   *
-#> Z12            0.6197995 0.52298225 0.7084738   *
-#> Z21            0.6633120 0.58433910 0.7543839   *
-#> Z22            0.8424813 0.75091983 0.9208518   *
-#> A1             0.9184800 0.84147585 1.0085285   *
-#> A2             0.9595998 0.88618361 1.0369087   *
-#> Z11:A1         0.1152546 0.02769461 0.2150141   *
-#> Z12:A1         0.1891494 0.08295130 0.2965337   *
-#> Z21:A2         0.3637038 0.27759153 0.4603982   *
-#> Z22:A2         0.4827637 0.39764602 0.5685890   *
-#> A1:A2          0.7725062 0.72906496 0.8206921   *
+#>              S2_Estimator       Lower      Upper sig
+#> (Intercept)  9.446462e-01  0.83695106 1.04912712   *
+#> X11          1.454813e-01  0.10332089 0.18496256   *
+#> X12         -2.203889e-03 -0.05378819 0.03937988    
+#> X21          2.952367e-01  0.24873686 0.33748581   *
+#> X22          3.977928e-01  0.35674192 0.43961053   *
+#> Z11          4.815334e-01  0.39262997 0.56049903   *
+#> Z12          8.860307e-05 -0.07884948 0.08519691    
+#> Z21          2.186006e-02 -0.06120048 0.11225471    
+#> Z22          7.478997e-01  0.66070564 0.84609196   *
+#> A1          -2.847638e-02 -0.09220293 0.03182853    
+#> A2          -2.734502e-02 -0.09837143 0.07710229    
+#> Z11:A1       1.254810e-01  0.04402056 0.20808459   *
+#> Z12:A1       2.334790e-01  0.14464795 0.32167582   *
+#> Z21:A2       9.672511e-01  0.89485346 1.05950271   *
+#> Z22:A2       5.856729e-01  0.49868921 0.65272278   *
+#> A1:A2        8.014366e-01  0.76122619 0.84148385   *
 ```

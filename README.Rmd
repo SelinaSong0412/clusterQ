@@ -121,7 +121,7 @@ p
 
 ***Calcuating the resample size at stage 1***
 
-Use function `nonreg()` to calculate the resample size (M) from N clusters at stage 1. 
+Use function `estM()` to calculate the resample size (M) from N clusters at stage 1. 
 
 ```{r}
 M = estM(N, p, lambda = 0.025)
