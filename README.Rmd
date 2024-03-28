@@ -24,16 +24,16 @@ expit <- function(x) {return(exp(x)/ (1 + exp(x)))}
 <!-- badges: start -->
 <!-- badges: end -->
 
-A clustered Q-learning algorithm with $M$-out-of-$N$ cluster bootstrap for making inference on tailoring variables for optimal dynamic treatment regimes (DTR) from clustered sequential multiple assignment randomized trials (clustered SMART). This tool is developed based on work by Speth, et al. (2024).
+A clustered Q-learning algorithm with $M\text{-out-of-}N$ cluster bootstrap for making inference on tailoring variables for optimal dynamic treatment regimes (DTR) from clustered sequential multiple assignment randomized trials (clustered SMART). This tool is developed based on work by Speth, et al. (2024).
 
 
 ## Installation
 
-You can install the development version of MOTRL from [GitHub](https://github.com/) with:
+You can install the development version of clusterQ from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("SelinaSong0412/clusterQ")
+devtools::install_github("Team-Wang-Lab/clusterQ")
 ```
 
 ## Example
