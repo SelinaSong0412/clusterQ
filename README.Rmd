@@ -41,7 +41,7 @@ devtools::install_github("Team-Wang-Lab/clusterQ")
 See below for two examples of using clusterQ to estimating tolerant DTR.
 
 ```{r example}
-library(clusterQ)
+library(clusterQ)  
 ```
 
 

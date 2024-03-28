@@ -7,10 +7,9 @@ Author: Yao Song
 Encoding: UTF-8
 Maintainer: Yao Song <yaos@umich.edu>
 Description: Functions to implement clustered Q-learning for estimating optimal
-        dynamic treatment regimes from multi-stage multi-level sequentially
+        dynamic treatment regimes (DTR) from multi-stage multi-level sequentially
         randomized trials, and to perform inference via M-out-of-N
         bootstrap for parameters indexing the optimal regime.
-LazyData: true
 Depends: 
     R (>= 3.5.0)
 Imports:
