@@ -58,10 +58,10 @@ Sigma <- matrix(rho, N, N) + diag(1-rho, N)  # Exchangeable correlation matrix
 cluster_residuals <- mvrnorm(n = ni, mu = rep(0, N), Sigma = Sigma)
 ```
 
-We consider two patient-level covariates $X_1$ and $X_2$, and two cluster-level data $Z_1$ and $Z_2$. Assume treatment at each stages ($A_1$ and $A_2$) were randomly assigned at equal weight. Stage 2 data can be simulated as follows:
+We consider two patient-level covariates $X_1$ and $X_2$, and two cluster-level data $Z_1$ and $Z_2$. Assume treatment at each stages ($A_1$ and $A_2$) were randomly assigned at equal weight. Stage 1 data can be simulated as follows:
 
 ```{r}
-################ Simulate Stage 2 data ###################
+################ Simulate Stage 1 data ###################
 df <- data.frame( 
   cluster_id = rep(1:N, each = ni),        # cluster-specific ID
   X11 = rnorm(n),                          # Stage 1 patient-level data

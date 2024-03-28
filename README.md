@@ -48,11 +48,11 @@ cluster_residuals <- mvrnorm(n = ni, mu = rep(0, N), Sigma = Sigma)
 
 We consider two patient-level covariates $X_1$ and $X_2$, and two
 cluster-level data $Z_1$ and $Z_2$. Assume treatment at each stages
-($A_1$ and $A_2$) were randomly assigned at equal weight. Stage 2 data
+($A_1$ and $A_2$) were randomly assigned at equal weight. Stage 1 data
 can be simulated as follows:
 
 ``` r
-################ Simulate Stage 2 data ###################
+################ Simulate Stage 1 data ###################
 df <- data.frame( 
   cluster_id = rep(1:N, each = ni),        # cluster-specific ID
   X11 = rnorm(n),                          # Stage 1 patient-level data
@@ -113,7 +113,7 @@ the data and stage 2 Q-function.
 p = nonreg(s2Formula = Formula2, s2_data = df, s2Treat = "A2", 
            cluster = "cluster_id", nu = 0.05)
 p
-#> [1] 0.75
+#> [1] 0.89
 ```
 
 ***Calcuating the resample size at stage 1***
@@ -124,7 +124,7 @@ at stage 1.
 ``` r
 M = estM(N, p, lambda = 0.025)
 M
-#> [1] 92
+#> [1] 91
 ```
 
 ***Inference with M-out-of-N cluster bootstrap***
@@ -143,23 +143,23 @@ results = clusterQ_MN(completeData = df,
                       bootNum = 100,
                       lambda = 0.025,
                       alpha = 0.05)
-#> The estimated degree of nonregularity for stage 1 is 0.75 
-#> chosen value of M = 92 out of N = 100 clusters.
+#> The estimated degree of nonregularity for stage 1 is 0.89 
+#> chosen value of M = 91 out of N = 100 clusters.
 ```
 
 Check stage 1 inference by:
 
 ``` r
 results$s1Inference
-#>             S1_Estimator   Lower  Upper sig
-#> (Intercept)       4.4236  3.8285 5.0073   *
-#> X11               0.1825  0.1085 0.2689   *
-#> X12              -0.0315 -0.1075 0.0609    
-#> Z11               0.8628  0.3663 1.4594   *
-#> Z12              -0.3110 -0.8802 0.4390    
-#> A1                0.7454  0.1435 1.3002   *
-#> Z11:A1            0.2784 -0.3397 1.0143    
-#> Z12:A1            0.2537 -0.4278 0.8203
+#>             S1_Estimator   Lower   Upper sig
+#> (Intercept)       4.6396  4.1289  5.0166   *
+#> X11               0.1483  0.0665  0.2407   *
+#> X12               0.1577  0.0729  0.2444   *
+#> Z11               0.2094 -0.2160  0.7287    
+#> Z12               0.2864 -0.1363  0.7585    
+#> A1                1.1992  0.8364  1.7085   *
+#> Z11:A1           -0.4744 -1.0042 -0.0568   *
+#> Z12:A1            0.4441 -0.0607  0.8573
 ```
 
 Check stage 2 inference by:
@@ -167,20 +167,20 @@ Check stage 2 inference by:
 ``` r
 results$s2Inference
 #>             S2_Estimator   Lower  Upper sig
-#> (Intercept)       1.0753  0.9451 1.1730   *
-#> X11               0.0739  0.0352 0.1196   *
-#> X12              -0.0090 -0.0542 0.0356    
-#> X21               0.3224  0.2721 0.3626   *
-#> X22               0.3882  0.3383 0.4388   *
-#> Z11               0.5066  0.4294 0.6193   *
-#> Z12               0.0073 -0.0672 0.1041    
-#> Z21               0.0051 -0.0702 0.1021    
-#> Z22               0.7630  0.6767 0.8403   *
-#> A1               -0.0617 -0.1583 0.0147    
-#> A2                0.0446 -0.0449 0.1117    
-#> Z11:A1            0.1417  0.0358 0.2319   *
-#> Z12:A1            0.2608  0.1860 0.3618   *
-#> Z21:A2            0.9941  0.8998 1.0828   *
-#> Z22:A2            0.4833  0.3835 0.5790   *
-#> A1:A2             0.8006  0.7550 0.8557   *
+#> (Intercept)       1.0627  0.9292 1.1691   *
+#> X11               0.0862  0.0463 0.1334   *
+#> X12               0.0626  0.0194 0.1007   *
+#> X21               0.2633  0.2181 0.3073   *
+#> X22               0.4081  0.3605 0.4453   *
+#> Z11               0.5127  0.4335 0.6204   *
+#> Z12               0.1001  0.0112 0.2089   *
+#> Z21              -0.0556 -0.1756 0.0324    
+#> Z22               0.8671  0.7867 0.9525   *
+#> A1               -0.0199 -0.0861 0.0495    
+#> A2               -0.0097 -0.0925 0.0766    
+#> Z11:A1            0.1206  0.0366 0.2010   *
+#> Z12:A1            0.2743  0.1750 0.3649   *
+#> Z21:A2            0.9715  0.8888 1.0517   *
+#> Z22:A2            0.5052  0.3980 0.6122   *
+#> A1:A2             0.7595  0.7126 0.8028   *
 ```
