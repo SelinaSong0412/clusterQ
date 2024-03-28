@@ -6,20 +6,20 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-A clustered Q-learning algorithm with $M$-out-of-$N$ cluster bootstrap
-for making inference on tailoring variables for optimal dynamic
-treatment regimes (DTR) from clustered sequential multiple assignment
-randomized trials (clustered SMART). This tool is developed based on
-work by Speth, et al. (2024).
+A clustered Q-learning algorithm with $M\text{-out-of-}N$ cluster
+bootstrap for making inference on tailoring variables for optimal
+dynamic treatment regimes (DTR) from clustered sequential multiple
+assignment randomized trials (clustered SMART). This tool is developed
+based on work by Speth, et al. (2024).
 
 ## Installation
 
-You can install the development version of MOTRL from
+You can install the development version of clusterQ from
 [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("SelinaSong0412/clusterQ")
+devtools::install_github("Team-Wang-Lab/clusterQ")
 ```
 
 ## Example
@@ -113,7 +113,7 @@ the data and stage 2 Q-function.
 p = nonreg(s2Formula = Formula2, s2_data = df, s2Treat = "A2", 
            cluster = "cluster_id", nu = 0.05)
 p
-#> [1] 0.7
+#> [1] 0.75
 ```
 
 ***Calcuating the resample size at stage 1***
@@ -124,7 +124,7 @@ at stage 1.
 ``` r
 M = estM(N, p, lambda = 0.025)
 M
-#> [1] 93
+#> [1] 92
 ```
 
 ***Inference with M-out-of-N cluster bootstrap***
@@ -143,23 +143,23 @@ results = clusterQ_MN(completeData = df,
                       bootNum = 100,
                       lambda = 0.025,
                       alpha = 0.05)
-#> The estimated degree of nonregularity for stage 1 is 0.7 
-#> chosen value of M = 93 out of N = 100 clusters.
+#> The estimated degree of nonregularity for stage 1 is 0.75 
+#> chosen value of M = 92 out of N = 100 clusters.
 ```
 
 Check stage 1 inference by:
 
 ``` r
 results$s1Inference
-#>             S1_Estimator   Lower   Upper sig
-#> (Intercept)       3.6908  3.2759  4.1594   *
-#> X11               0.2062  0.1057  0.3241   *
-#> X12               0.0128 -0.0743  0.1044    
-#> Z11               1.0280  0.5378  1.5593   *
-#> Z12              -0.4867 -1.1526 -0.1140   *
-#> A1                0.3557 -0.0691  0.7537    
-#> Z11:A1           -0.0780 -0.5853  0.3670    
-#> Z12:A1            0.3903 -0.0791  0.8890
+#>             S1_Estimator   Lower  Upper sig
+#> (Intercept)       4.4236  3.8285 5.0073   *
+#> X11               0.1825  0.1085 0.2689   *
+#> X12              -0.0315 -0.1075 0.0609    
+#> Z11               0.8628  0.3663 1.4594   *
+#> Z12              -0.3110 -0.8802 0.4390    
+#> A1                0.7454  0.1435 1.3002   *
+#> Z11:A1            0.2784 -0.3397 1.0143    
+#> Z12:A1            0.2537 -0.4278 0.8203
 ```
 
 Check stage 2 inference by:
@@ -167,20 +167,20 @@ Check stage 2 inference by:
 ``` r
 results$s2Inference
 #>             S2_Estimator   Lower  Upper sig
-#> (Intercept)       0.8391  0.7363 0.9438   *
-#> X11               0.1025  0.0588 0.1372   *
-#> X12              -0.0001 -0.0447 0.0528    
-#> X21               0.2989  0.2618 0.3415   *
-#> X22               0.4161  0.3695 0.4540   *
-#> Z11               0.5326  0.4371 0.6131   *
-#> Z12              -0.0196 -0.1075 0.0685    
-#> Z21               0.0830 -0.0151 0.1794    
-#> Z22               0.7988  0.7053 0.8646   *
-#> A1                0.0450 -0.0313 0.1094    
-#> A2               -0.0418 -0.1467 0.0582    
-#> Z11:A1           -0.0094 -0.1142 0.0907    
-#> Z12:A1            0.2066  0.1104 0.2759   *
-#> Z21:A2            1.0802  0.9769 1.1917   *
-#> Z22:A2            0.4596  0.3795 0.5485   *
-#> A1:A2             0.7656  0.7115 0.8078   *
+#> (Intercept)       1.0753  0.9451 1.1730   *
+#> X11               0.0739  0.0352 0.1196   *
+#> X12              -0.0090 -0.0542 0.0356    
+#> X21               0.3224  0.2721 0.3626   *
+#> X22               0.3882  0.3383 0.4388   *
+#> Z11               0.5066  0.4294 0.6193   *
+#> Z12               0.0073 -0.0672 0.1041    
+#> Z21               0.0051 -0.0702 0.1021    
+#> Z22               0.7630  0.6767 0.8403   *
+#> A1               -0.0617 -0.1583 0.0147    
+#> A2                0.0446 -0.0449 0.1117    
+#> Z11:A1            0.1417  0.0358 0.2319   *
+#> Z12:A1            0.2608  0.1860 0.3618   *
+#> Z21:A2            0.9941  0.8998 1.0828   *
+#> Z22:A2            0.4833  0.3835 0.5790   *
+#> A1:A2             0.8006  0.7550 0.8557   *
 ```
