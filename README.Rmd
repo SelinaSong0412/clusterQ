@@ -41,7 +41,7 @@ devtools::install_github("SelinaSong0412/clusterQ")
 See below for two examples of using clusterQ to estimating tolerant DTR.
 
 ```{r example}
-library(clusterQ)
+library(clusterQ) 
 ```
 
 
